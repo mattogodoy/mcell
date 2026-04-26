@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Android
+*.apk
+*.aab
+*.keystore
+captures/
+
+# OS
+.DS_Store
+
+# Brainstorming companion
+.superpowers/
