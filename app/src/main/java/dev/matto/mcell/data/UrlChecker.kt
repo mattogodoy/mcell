@@ -14,9 +14,13 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLException
 
-class UrlChecker(private val client: OkHttpClient) {
+interface UrlCheckerLike {
+    suspend fun check(rawUrl: String): CheckStatus
+}
 
-    suspend fun check(rawUrl: String): CheckStatus = withContext(Dispatchers.IO) {
+class UrlChecker(private val client: OkHttpClient) : UrlCheckerLike {
+
+    override suspend fun check(rawUrl: String): CheckStatus = withContext(Dispatchers.IO) {
         val request = try {
             buildRequest(rawUrl, head = true)
         } catch (_: IllegalArgumentException) {

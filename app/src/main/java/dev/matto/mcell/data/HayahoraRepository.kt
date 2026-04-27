@@ -52,18 +52,22 @@ import java.time.format.DateTimeFormatter
  * than [maxStaleness] (or unparseable), we also return `Unknown` to avoid surfacing
  * data that may not reflect reality.
  */
+interface HayahoraRepositoryLike {
+    suspend fun fetchStatus(): BlockStatus
+}
+
 class HayahoraRepository(
     private val client: OkHttpClient,
     private val url: String = "https://hayahora.futbol/estado/data.json",
     private val clock: Clock = Clock.systemUTC(),
     private val maxStaleness: Duration = Duration.ofHours(6),
-) {
+) : HayahoraRepositoryLike {
     private val json = Json { ignoreUnknownKeys = true }
 
     private val lastUpdateFormatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC)
 
-    suspend fun fetchStatus(): BlockStatus = withContext(Dispatchers.IO) {
+    override suspend fun fetchStatus(): BlockStatus = withContext(Dispatchers.IO) {
         try {
             val req = Request.Builder()
                 .url(url)

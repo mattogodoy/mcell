@@ -12,16 +12,21 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-class UrlListRepository(private val store: PrefStore) {
+interface UrlListRepositoryLike {
+    val flow: Flow<List<String>>
+    suspend fun save(urls: List<String>)
+}
+
+class UrlListRepository(private val store: PrefStore) : UrlListRepositoryLike {
 
     interface PrefStore {
         val flow: Flow<String?>
         suspend fun setRaw(value: String)
     }
 
-    val flow: Flow<List<String>> = store.flow.map { raw -> decode(raw) }
+    override val flow: Flow<List<String>> = store.flow.map { raw -> decode(raw) }
 
-    suspend fun save(urls: List<String>) {
+    override suspend fun save(urls: List<String>) {
         store.setRaw(json.encodeToString(stringList, urls))
     }
 
