@@ -56,20 +56,12 @@ class HomeViewModel(
         recheckAll()
     }
 
-    /** Reads the most recent online value synchronously when [online] is a [StateFlow]. */
-    @Suppress("UNCHECKED_CAST")
-    private fun isOffline(): Boolean {
-        val sf = online as? StateFlow<Boolean>
-        return if (sf != null) !sf.value else _state.value.deviceOffline
-    }
-
     fun recheckAll() {
         checkJobs.values.forEach { it.cancel() }
         checkJobs.clear()
         hayahoraJob?.cancel()
 
-        if (isOffline()) {
-            _state.update { it.copy(deviceOffline = true) }
+        if (_state.value.deviceOffline) {
             _state.update { current ->
                 current.copy(
                     urls = current.urls.map {
@@ -101,7 +93,7 @@ class HomeViewModel(
     }
 
     fun recheckOne(url: String) {
-        if (isOffline()) return
+        if (_state.value.deviceOffline) return
         recheckOneInternal(url)
     }
 

@@ -135,8 +135,9 @@ class HomeViewModelTest {
         val vm = HomeViewModel(list, checker, fakeHayahora(), online, MutableStateFlow(false))
         advanceUntilIdle()
 
-        checker.reset()
         online.value = false
+        advanceUntilIdle()  // let the collector update _state.deviceOffline
+        checker.reset()
         vm.recheckAll()
         advanceUntilIdle()
 
