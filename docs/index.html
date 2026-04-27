@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mcell · ¿Bloqueos de La Liga? Compruébalo en tu tele</title>
+  <meta name="description" content="App para Android TV y móviles que comprueba si los bloqueos de IPs de La Liga te están afectando ahora mismo." />
+  <meta name="theme-color" content="#0E1116" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <meta property="og:title" content="mcell" />
+  <meta property="og:description" content="¿Te afectan los bloqueos de La Liga? Compruébalo en tu tele." />
+  <meta property="og:image" content="assets/splash.png" />
+  <style>
+    :root {
+      --bg: #0E1116;
+      --bg-elevated: #1A1F2A;
+      --border: #232B3A;
+      --text: #E6E6E6;
+      --text-muted: #94A3B8;
+      --accent: #4A9EFF;
+      --danger: #EF4444;
+      --danger-soft: #FFD0D0;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .hero {
+      position: relative;
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("assets/splash.png") center/cover no-repeat;
+      opacity: 0.35;
+      z-index: 0;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(14,17,22,0.4) 0%, rgba(14,17,22,0.95) 100%);
+      z-index: 0;
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+    }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+    .tagline {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      margin: 0 auto 2.5rem;
+      max-width: 38rem;
+    }
+    .download {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-radius: 999px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 6px 24px rgba(74, 158, 255, 0.35);
+    }
+    .download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(74, 158, 255, 0.45);
+      text-decoration: none;
+    }
+    .download .arrow {
+      transition: transform 0.15s ease;
+    }
+    .download:hover .arrow {
+      transform: translateY(2px);
+    }
+    .download-meta {
+      margin-top: 0.9rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .download-meta code {
+      background: rgba(255,255,255,0.06);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    main {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+    section + section { margin-top: 3rem; }
+    h2 {
+      font-size: 1.5rem;
+      margin: 0 0 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    p { margin: 0 0 1rem; }
+
+    .callout {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .callout strong { color: var(--text); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem 3rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    footer p { margin: 0.4rem 0; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <img class="logo" src="assets/icon.png" alt="mcell" />
+    <h1>mcell</h1>
+    <p class="tagline">
+      Comprueba en tu Android TV (o móvil) si los bloqueos de IPs de
+      <strong>La Liga</strong> te están afectando ahora mismo.
+    </p>
+    <a class="download" href="https://github.com/mattogodoy/mcell/releases/latest/download/mcell.apk">
+      Descargar APK
+      <span class="arrow" aria-hidden="true">↓</span>
+    </a>
+    <p class="download-meta">
+      Android 8.0+ · APK firmado · instalación manual (activa <code>Orígenes desconocidos</code>)
+    </p>
+  </header>
+
+  <main>
+    <section>
+      <h2>¿Por qué existe esta app?</h2>
+      <p>
+        Cuando hay partido, los principales operadores españoles (Movistar, MasOrange,
+        Vodafone, DIGI) bloquean rangos enteros de IPs por orden judicial — y en el camino
+        rompen el acceso a CDNs que dan servicio a páginas legítimas: tiendas, medios,
+        equipos de fútbol e incluso la <a href="https://www.rae.es" rel="noopener">RAE</a>.
+      </p>
+      <p>
+        Si tu Smart TV se queda «cargando» justo cuando empieza el partido, probablemente
+        no es tu tele. mcell te ayuda a saberlo en dos segundos.
+      </p>
+    </section>
+
+    <section>
+      <h2>¿Cómo funciona?</h2>
+      <p>
+        La app comprueba un puñado de URLs (hasta 6, las que tú elijas) directamente desde
+        tu red. Si responden, salen en verde; si caen por timeout, DNS roto o TLS fallido,
+        salen en rojo. Sin caché, sin telemetría, sin cuentas.
+      </p>
+      <p>
+        En la parte superior, un banner global te dice si los bloqueos están activos a
+        nivel nacional consultando los datos públicos de
+        <a href="https://hayahora.futbol" rel="noopener">hayahora.futbol</a>.
+      </p>
+    </section>
+
+    <section class="callout">
+      <p>
+        <strong>Atribución:</strong> el estado global de los bloqueos lo calcula
+        <a href="https://hayahora.futbol" rel="noopener">hayahora.futbol</a>, un proyecto
+        independiente que monitoriza en tiempo real qué IPs están bloqueadas. mcell sólo
+        consulta su API pública. Si te resulta útil esta app, considera contribuir o
+        dejarles constancia con
+        <a href="https://ooni.org/install/" rel="noopener">OONI&nbsp;Probe</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Privacidad</h2>
+      <p>
+        mcell hace peticiones HTTP a las URLs que tú configures y a
+        <code>hayahora.futbol/estado/data.json</code>, nada más. No envía datos a ningún
+        otro servidor, no recoge analíticas, no requiere cuenta ni permisos especiales
+        más allá del acceso a internet.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Datos de bloqueos por
+      <a href="https://hayahora.futbol" rel="noopener">hayahora.futbol</a>.
+    </p>
+    <p>
+      Código abierto en
+      <a href="https://github.com/mattogodoy/mcell" rel="noopener">GitHub</a>.
+    </p>
+  </footer>
+
+</body>
+</html>
