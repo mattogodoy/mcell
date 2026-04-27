@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mcell</string>
+
+    <!-- Banner -->
+    <string name="banner_blocks_active">Bloqueos activos</string>
+    <string name="banner_blocks_active_subtitle">Hay restricciones a CDNs por partido en curso</string>
+    <string name="banner_no_blocks">Sin bloqueos detectados</string>
+    <string name="banner_no_blocks_subtitle">Las restricciones de La Liga no están activas</string>
+    <string name="banner_unknown">Estado desconocido</string>
+    <string name="banner_unknown_subtitle">No se pudo consultar hayahora.futbol</string>
+    <string name="banner_offline">Sin conexión a internet</string>
+    <string name="banner_offline_subtitle">Conéctate a una red para comprobar</string>
+
+    <!-- VPN pill -->
+    <string name="vpn_pill_yes">VPN: SÍ</string>
+    <string name="vpn_pill_no">VPN: NO</string>
+
+    <!-- Buttons -->
+    <string name="recheck_all">Recomprobar todo</string>
+    <string name="manage_urls">Gestionar URLs</string>
+    <string name="add_url">Añadir URL</string>
+    <string name="cancel">Cancelar</string>
+    <string name="confirm_add">Añadir</string>
+    <string name="close">Cerrar</string>
+    <string name="delete">Eliminar</string>
+
+    <!-- Status reasons -->
+    <string name="status_loading">Comprobando…</string>
+    <string name="status_reachable">Accesible (%1$d)</string>
+    <string name="status_http_error">Error %1$d</string>
+    <string name="reason_timeout">Tiempo de espera agotado</string>
+    <string name="reason_dns">DNS no resuelto</string>
+    <string name="reason_refused">Conexión rechazada</string>
+    <string name="reason_tls">Error de TLS</string>
+    <string name="reason_network">Error de red</string>
+    <string name="reason_invalid">URL inválida</string>
+    <string name="reason_offline">Sin conexión a internet</string>
+
+    <!-- Manage URLs dialog -->
+    <string name="manage_title">Gestionar URLs</string>
+    <string name="manage_hint">https://ejemplo.com</string>
+    <string name="manage_full">Has alcanzado el máximo de 5 URLs</string>
+    <string name="manage_duplicate">Ya añadida</string>
+    <string name="manage_invalid">URL inválida</string>
+    <string name="manage_empty">El campo está vacío</string>
+
+    <!-- Last checked -->
+    <string name="last_checked">Comprobada a las %1$s</string>
+    <string name="last_checked_never">Sin comprobar</string>
+</resources>
