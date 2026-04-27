@@ -19,7 +19,6 @@
     <!-- Buttons -->
     <string name="recheck_all">Recomprobar todo</string>
     <string name="manage_urls">Gestionar URLs</string>
-    <string name="add_url">Añadir URL</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm_add">Añadir</string>
     <string name="close">Cerrar</string>
@@ -43,9 +42,7 @@
     <string name="manage_full">Has alcanzado el máximo de 5 URLs</string>
     <string name="manage_duplicate">Ya añadida</string>
     <string name="manage_invalid">URL inválida</string>
-    <string name="manage_empty">El campo está vacío</string>
 
     <!-- Last checked -->
-    <string name="last_checked">Comprobada a las %1$s</string>
     <string name="last_checked_never">Sin comprobar</string>
 </resources>
