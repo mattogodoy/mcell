@@ -59,4 +59,4 @@ Block data is generously published by **[hayahora.futbol](https://hayahora.futbo
 
 ## License
 
-Not yet decided. Treat as "all rights reserved" until a `LICENSE` file is added.
+[GNU General Public License v3.0](LICENSE).
