@@ -8,13 +8,13 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <application
+        android:name=".McellApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:label="mcell"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mcell">
-        <!-- TODO Task 9: restore android:name=".McellApplication" -->
         <!-- TODO Task 17: restore android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:banner="@drawable/tv_banner" -->
 
         <activity
