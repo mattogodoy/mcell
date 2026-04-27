@@ -23,6 +23,10 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Stopgap: sign release with the auto-generated debug key so APKs in
+            // GitHub Releases install on real devices. Replace with a proper
+            // keystore before publishing on Play Store.
+            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
             isMinifyEnabled = false
