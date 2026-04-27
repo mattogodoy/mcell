@@ -2,61 +2,61 @@
 
 > ¿Bloqueos de La Liga? Compruébalo en tu tele.
 
-A small Android app — for both Android TV and phones — that tells you whether the ISP-level blocks ordered by La Liga are currently affecting the URLs you care about.
+Una aplicación de Android — para Android TV y móviles — que te dice si los bloqueos a nivel de ISP ordenados por La Liga están afectando ahora mismo a las URLs que te importan.
 
-[**Landing page**](https://mattogodoy.github.io/mcell/) · [**Download APK**](https://github.com/mattogodoy/mcell/releases/latest/download/mcell.apk)
+[**Sitio web**](https://mattogodoy.github.io/mcell/) · [**Descargar APK**](https://github.com/mattogodoy/mcell/releases/latest/download/mcell.apk)
 
 <p align="center">
-  <img src="docs/assets/icon.png" alt="mcell icon" width="160" />
+  <img src="docs/assets/icon.png" alt="mcell" width="160" />
 </p>
 
-## Why
+## Por qué
 
-When there's a match on, the major Spanish ISPs (Movistar, MasOrange, Vodafone, DIGI) are required by court order to block entire IP ranges to fight piracy. The blocks are too broad and routinely take down legitimate CDNs that host shops, news sites, football clubs, sponsors, even the RAE. If your smart TV stops loading streams the moment kickoff happens, it's probably not your TV.
+Cuando hay partido, los principales ISPs españoles (Movistar, MasOrange, Vodafone, DIGI) están obligados por orden judicial a bloquear rangos enteros de IPs para combatir la piratería. Los bloqueos son demasiado amplios y rompen sistemáticamente el acceso a CDNs legítimos que alojan tiendas, medios, equipos de fútbol, patrocinadores e incluso la RAE. Si tu Smart TV deja de cargar contenido justo cuando empieza el partido, probablemente no es tu tele.
 
-mcell shows, in two seconds, whether a URL you care about is reachable from your current network *right now*.
+mcell te muestra, en dos segundos, si una URL que te importa es accesible desde tu red *ahora mismo*.
 
-## Features
+## Funciones
 
-- Single APK runs on **Android TV** (leanback) and **Android phones** (touch). `minSdk` 26, `targetSdk` 34.
-- Up to **6 user-configurable URLs**, three-state status (reachable / HTTP error / network error) with a localized reason on focus.
-- A **global block banner** at the top, sourced from [hayahora.futbol](https://hayahora.futbol)'s public data and mirroring their homepage classification rule.
-- **VPN detection** via `ConnectivityManager`.
-- **No cache.** Every check is a fresh network request — that's the whole point.
-- **No telemetry, no accounts, no analytics.** Network access is the only permission requested.
-- Castilian Spanish UI only.
+- Un único APK funciona en **Android TV** (leanback) y **móviles Android** (táctil). `minSdk` 26, `targetSdk` 34.
+- Hasta **6 URLs configurables**, con estado en tres niveles (accesible / error HTTP / error de red) y un motivo localizado al enfocar la fila.
+- Un **banner de estado global** en la parte superior, alimentado por los datos públicos de [hayahora.futbol](https://hayahora.futbol) y replicando la lógica de clasificación de su página principal.
+- **Detección de VPN** mediante `ConnectivityManager`.
+- **Sin caché.** Cada comprobación es una petición de red nueva — esa es la idea.
+- **Sin telemetría, sin cuentas, sin analíticas.** El único permiso que pide es el acceso a internet.
+- Interfaz solo en español (castellano).
 
-## Install
+## Instalación
 
-Grab the latest signed APK from [Releases](https://github.com/mattogodoy/mcell/releases/latest). Sideload it on your TV or phone (you'll need to allow installs from unknown sources).
+Descarga el APK firmado más reciente desde [Releases](https://github.com/mattogodoy/mcell/releases/latest) e instálalo manualmente en tu tele o móvil (tendrás que permitir la instalación de orígenes desconocidos).
 
-## Build
+## Compilación
 
-Requirements: JDK 17, Android SDK with Compose support.
+Requisitos: JDK 17 y el SDK de Android con soporte para Compose.
 
 ```bash
 ./gradlew :app:assembleDebug
 ./gradlew :app:testDebugUnitTest
 ```
 
-The unit-test suite covers the URL checker, the hayahora.futbol parser (with its staleness guard), the URL list repository, the banner derivation, and the `HomeViewModel` state machine — currently 35 tests.
+La batería de tests unitarios cubre el comprobador de URLs, el parser de hayahora.futbol (con su control de antigüedad de los datos), el repositorio de la lista de URLs, la derivación del banner y la máquina de estados de `HomeViewModel` — 35 tests actualmente.
 
 ## Stack
 
-- Kotlin + Jetpack Compose, with `androidx.tv.material3` for TV-side focus styling.
-- OkHttp for URL checks (HEAD with GET fallback, cache disabled at every layer).
-- AndroidX DataStore Preferences for the user's URL list.
-- `kotlinx.serialization` for the hayahora.futbol JSON.
-- MVVM with a single `:app` module and manual DI via an `AppContainer`.
+- Kotlin + Jetpack Compose, con `androidx.tv.material3` para el estilo de foco en TV.
+- OkHttp para las comprobaciones de URL (HEAD con fallback a GET y caché desactivada en todos los niveles).
+- AndroidX DataStore Preferences para guardar la lista de URLs del usuario.
+- `kotlinx.serialization` para parsear el JSON de hayahora.futbol.
+- MVVM con un único módulo `:app` e inyección de dependencias manual mediante un `AppContainer`.
 
-## How the global banner is computed
+## Cómo se calcula el estado global
 
-The banner mirrors the rule used by `hayahora.futbol`'s own homepage: blocks are considered active when **either** more than 10 distinct Cloudflare IPs are currently blocked by more than 2 ISPs each, **or** both `188.114.96.5` and `188.114.97.5` are blocked by any ISP. If hayahora's `lastUpdate` is older than 6 hours we fall back to "unknown" rather than reporting stale data.
+El banner replica la regla que usa la propia página de `hayahora.futbol`: los bloqueos se consideran activos cuando **o bien** hay más de 10 IPs distintas de Cloudflare bloqueadas por más de 2 ISPs cada una, **o bien** tanto `188.114.96.5` como `188.114.97.5` están bloqueadas por cualquier ISP. Si el `lastUpdate` de hayahora tiene más de 6 horas, mostramos "desconocido" antes que datos potencialmente desactualizados.
 
-## Attribution
+## Atribución
 
-Block data is generously published by **[hayahora.futbol](https://hayahora.futbol)**, an independent project that monitors La Liga blocks across all major Spanish ISPs in real time. mcell only consumes their public JSON — no scraping, no shadow API. If you find the app useful, consider helping document blocks from your own connection with [OONI Probe](https://ooni.org/install/).
+Los datos sobre bloqueos los publica generosamente **[hayahora.futbol](https://hayahora.futbol)**, un proyecto independiente que monitoriza los bloqueos de La Liga en todos los principales ISPs españoles en tiempo real. mcell se limita a consumir su JSON público — sin scraping ni APIs ocultas. Si esta app te resulta útil, considera ayudar a documentar bloqueos desde tu propia conexión con [OONI Probe](https://ooni.org/install/).
 
-## License
+## Licencia
 
-[GNU General Public License v3.0](LICENSE).
+[Licencia Pública General GNU v3.0](LICENSE).
