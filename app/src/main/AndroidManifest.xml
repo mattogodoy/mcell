@@ -10,12 +10,14 @@
     <application
         android:name=".McellApplication"
         android:allowBackup="true"
+        android:banner="@drawable/tv_banner"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
         android:label="mcell"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mcell">
-        <!-- TODO Task 17: restore android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:banner="@drawable/tv_banner" -->
 
         <activity
             android:name=".MainActivity"
