@@ -13,6 +13,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.time.Clock
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * Polls https://hayahora.futbol/estado/data.json and decides whether sport-streaming
@@ -42,13 +47,20 @@ import okhttp3.Request
  * active for an entry when its most-recent `stateChanges` element has `state == true`.
  * The list-level status returned here is `Active` if **any** entry is currently active,
  * else `Inactive`. Schema surprises (missing `data`, no readable timestamps, etc.)
- * downgrade to `Unknown` rather than throw.
+ * downgrade to `Unknown` rather than throw. If the top-level `lastUpdate` is older
+ * than [maxStaleness] (or unparseable), we also return `Unknown` to avoid surfacing
+ * data that may not reflect reality.
  */
 class HayahoraRepository(
     private val client: OkHttpClient,
     private val url: String = "https://hayahora.futbol/estado/data.json",
+    private val clock: Clock = Clock.systemUTC(),
+    private val maxStaleness: Duration = Duration.ofHours(6),
 ) {
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    private val json = Json { ignoreUnknownKeys = true }
+
+    private val lastUpdateFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC)
 
     suspend fun fetchStatus(): BlockStatus = withContext(Dispatchers.IO) {
         runCatching {
@@ -59,8 +71,14 @@ class HayahoraRepository(
                 .cacheControl(CacheControl.FORCE_NETWORK)
                 .build()
             client.newCall(req).execute().use { resp ->
-                if (!resp.isSuccessful) return@withContext BlockStatus.Unknown
-                val body = resp.body?.string() ?: return@withContext BlockStatus.Unknown
+                if (!resp.isSuccessful) {
+                    Log.w("mcell.hayahora", "non-2xx response: ${resp.code}")
+                    return@withContext BlockStatus.Unknown
+                }
+                val body = resp.body?.string() ?: run {
+                    Log.w("mcell.hayahora", "empty response body")
+                    return@withContext BlockStatus.Unknown
+                }
                 parseStatus(body)
             }
         }.getOrElse { e ->
@@ -76,7 +94,22 @@ class HayahoraRepository(
                 return BlockStatus.Unknown
             }
         return runCatching {
-            val data = element.jsonObject["data"]?.jsonArray
+            val root = element.jsonObject
+            val lastUpdate = root["lastUpdate"]?.jsonPrimitive?.content
+                ?: return BlockStatus.Unknown
+            val lastUpdateInstant = runCatching {
+                LocalDateTime.parse(lastUpdate, lastUpdateFormatter)
+                    .toInstant(ZoneOffset.UTC)
+            }.getOrElse {
+                Log.w("mcell.hayahora", "lastUpdate parse failed: $it")
+                return BlockStatus.Unknown
+            }
+            val age = Duration.between(lastUpdateInstant, clock.instant())
+            if (age > maxStaleness) {
+                Log.w("mcell.hayahora", "data stale: lastUpdate=$lastUpdate age=$age")
+                return BlockStatus.Unknown
+            }
+            val data = root["data"]?.jsonArray
                 ?: return BlockStatus.Unknown
             val anyActive = data.any { entry -> entryIsCurrentlyActive(entry) }
             if (anyActive) BlockStatus.Active else BlockStatus.Inactive
@@ -90,8 +123,7 @@ class HayahoraRepository(
      * An entry is currently active if its most recent `stateChanges` element has
      * `state == true`. The latest element is selected by lexicographic timestamp
      * compare — the observed format `YYYY-MM-DD HH:MM:SSZ` (and any ISO-like
-     * variant) sorts identically lexicographically and chronologically. Falls back
-     * to the last array element when timestamps are missing.
+     * variant) sorts identically lexicographically and chronologically.
      */
     private fun entryIsCurrentlyActive(entry: JsonElement): Boolean = runCatching {
         val obj = entry.jsonObject
@@ -99,7 +131,7 @@ class HayahoraRepository(
         if (changes.isEmpty()) return@runCatching false
         val latest = changes.maxByOrNull { c ->
             c.jsonObject["timestamp"]?.jsonPrimitive?.content ?: ""
-        } ?: changes.last()
+        }!!
         latest.jsonObject["state"]?.jsonPrimitive?.booleanOrNull ?: false
     }.getOrElse { e ->
         Log.w("mcell.hayahora", "entry parse skipped: $e")

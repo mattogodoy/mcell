@@ -1,0 +1,34 @@
+{
+  "lastUpdate": "2026-04-27 12:00:00",
+  "data": [
+    {
+      "ip": "10.0.0.1",
+      "isp": "Empty",
+      "description": "Empty stateChanges array",
+      "stateChanges": []
+    },
+    {
+      "ip": "10.0.0.2",
+      "isp": "Missing",
+      "description": "No stateChanges field at all"
+    },
+    {
+      "ip": "10.0.0.3",
+      "isp": "NoState",
+      "description": "Latest stateChange missing state field",
+      "stateChanges": [
+        {"timestamp": "2026-04-20 09:00:00Z", "state": false},
+        {"timestamp": "2026-04-26 09:00:00Z"}
+      ]
+    },
+    {
+      "ip": "10.0.0.4",
+      "isp": "Normal",
+      "description": "Normal entry, currently inactive",
+      "stateChanges": [
+        {"timestamp": "2026-04-20 09:00:00Z", "state": true},
+        {"timestamp": "2026-04-26 10:00:00Z", "state": false}
+      ]
+    }
+  ]
+}
