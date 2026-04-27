@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +39,14 @@ class NetworkStateDetector(
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) = emitCurrent()
         }
 
-        connectivity.registerDefaultNetworkCallback(cb)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivity.registerDefaultNetworkCallback(cb)
+        } else {
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+            connectivity.registerNetworkCallback(request, cb)
+        }
         emitCurrent()
         awaitClose { connectivity.unregisterNetworkCallback(cb) }
     }.shareIn(scope, SharingStarted.WhileSubscribed(5000), replay = 1)
