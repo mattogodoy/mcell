@@ -27,10 +27,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -58,6 +62,19 @@ fun ManageUrlsDialog(
     val errorFull = stringResource(R.string.manage_full)
     val errorInvalid = stringResource(R.string.manage_invalid)
     val isFull = urls.size >= HomeViewModel.MAX_URLS
+
+    val submit: () -> Unit = {
+        if (!isFull && input.isNotBlank()) {
+            scope.launch {
+                when (onAdd(input)) {
+                    AddUrlResult.Added -> { input = ""; error = null }
+                    AddUrlResult.Duplicate -> error = errorDuplicate
+                    AddUrlResult.Full -> error = errorFull
+                    AddUrlResult.Invalid -> error = errorInvalid
+                }
+            }
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -110,6 +127,12 @@ fun ManageUrlsDialog(
                     },
                     enabled = !isFull,
                     isError = error != null,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Go,
+                    ),
+                    keyboardActions = KeyboardActions(onGo = { submit() }),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 if (error != null) {
@@ -119,16 +142,7 @@ fun ManageUrlsDialog(
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         enabled = !isFull && input.isNotBlank(),
-                        onClick = {
-                            scope.launch {
-                                when (onAdd(input)) {
-                                    AddUrlResult.Added -> { input = ""; error = null }
-                                    AddUrlResult.Duplicate -> error = errorDuplicate
-                                    AddUrlResult.Full -> error = errorFull
-                                    AddUrlResult.Invalid -> error = errorInvalid
-                                }
-                            }
-                        },
+                        onClick = submit,
                     ) {
                         Text(stringResource(R.string.confirm_add))
                     }
