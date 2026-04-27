@@ -1,8 +1,9 @@
 # mcell
+Me cago en La Liga
 
 > ¿Bloqueos de La Liga? Compruébalo en tu tele.
 
-Una aplicación de Android — para Android TV y móviles — que te dice si los bloqueos a nivel de ISP ordenados por La Liga están afectando ahora mismo a las URLs que te importan.
+Una aplicación para Android TV y móviles que te dice si los bloqueos a nivel de ISP ordenados por La Liga están afectando ahora mismo a las URLs que te importan.
 
 [**Sitio web**](https://mattogodoy.github.io/mcell/) · [**Descargar APK**](https://github.com/mattogodoy/mcell/releases/latest/download/mcell.apk)
 
@@ -39,7 +40,7 @@ Requisitos: JDK 17 y el SDK de Android con soporte para Compose.
 ./gradlew :app:testDebugUnitTest
 ```
 
-La batería de tests unitarios cubre el comprobador de URLs, el parser de hayahora.futbol (con su control de antigüedad de los datos), el repositorio de la lista de URLs, la derivación del banner y la máquina de estados de `HomeViewModel` — 35 tests actualmente.
+La batería de tests unitarios cubre el comprobador de URLs, el parser de hayahora.futbol (con su control de antigüedad de los datos), el repositorio de la lista de URLs, la derivación del banner y la máquina de estados de `HomeViewModel`.
 
 ## Stack
 
@@ -55,7 +56,7 @@ El banner replica la regla que usa la propia página de `hayahora.futbol`: los b
 
 ## Atribución
 
-Los datos sobre bloqueos los publica generosamente **[hayahora.futbol](https://hayahora.futbol)**, un proyecto independiente que monitoriza los bloqueos de La Liga en todos los principales ISPs españoles en tiempo real. mcell se limita a consumir su JSON público — sin scraping ni APIs ocultas. Si esta app te resulta útil, considera ayudar a documentar bloqueos desde tu propia conexión con [OONI Probe](https://ooni.org/install/).
+Los datos sobre bloqueos son generosamente publicados por **[hayahora.futbol](https://hayahora.futbol)**, un proyecto independiente que monitoriza los bloqueos de La Liga en todos los principales ISPs españoles en tiempo real. mcell se limita a consumir su API pública, sin scraping ni APIs ocultas. Si esta app te resulta útil, considera ayudar a documentar bloqueos desde tu propia conexión con [OONI Probe](https://ooni.org/install/).
 
 ## Licencia
 
