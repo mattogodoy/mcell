@@ -1,6 +1,7 @@
 package dev.matto.mcell.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,42 +25,49 @@ import dev.matto.mcell.ui.manage.ManageUrlsDialog
 fun HomeScreen(viewModel: HomeViewModel) {
     val state by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        StatusBanner(
-            deviceOffline = state.deviceOffline,
-            hayahora = state.hayahora,
-            vpnActive = state.vpnActive,
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            StatusBanner(
+                deviceOffline = state.deviceOffline,
+                hayahora = state.hayahora,
+                vpnActive = state.vpnActive,
+            )
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-            items(state.urls, key = { it.url }) { item ->
-                UrlRow(item = item, onClick = { viewModel.recheckOne(item.url) })
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                items(state.urls, key = { it.url }) { item ->
+                    UrlRow(item = item, onClick = { viewModel.recheckOne(item.url) })
+                }
             }
+
+            Button(
+                onClick = { viewModel.recheckAll() },
+                enabled = !state.globalRecheckRunning,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text(stringResource(R.string.recheck_all)) }
+
+            OutlinedButton(
+                onClick = { viewModel.showManageDialog() },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text(stringResource(R.string.manage_urls)) }
         }
 
-        Button(
-            onClick = { viewModel.recheckAll() },
-            enabled = !state.globalRecheckRunning,
-            modifier = Modifier.fillMaxWidth(),
-        ) { Text(stringResource(R.string.recheck_all)) }
+        if (state.manageDialogVisible) {
+            ManageUrlsDialog(
+                urls = state.urls.map { it.url },
+                onAdd = { raw -> viewModel.addUrl(raw) },
+                onRemove = { url -> viewModel.removeUrl(url) },
+                onDismiss = { viewModel.hideManageDialog() },
+            )
+        }
 
-        OutlinedButton(
-            onClick = { viewModel.showManageDialog() },
-            modifier = Modifier.fillMaxWidth(),
-        ) { Text(stringResource(R.string.manage_urls)) }
-    }
-
-    if (state.manageDialogVisible) {
-        ManageUrlsDialog(
-            urls = state.urls.map { it.url },
-            onAdd = { raw -> viewModel.addUrl(raw) },
-            onRemove = { url -> viewModel.removeUrl(url) },
-            onDismiss = { viewModel.hideManageDialog() },
-        )
+        SplashOverlay()
     }
 }
