@@ -33,7 +33,6 @@ fun HomeScreen(viewModel: HomeViewModel) {
         StatusBanner(
             deviceOffline = state.deviceOffline,
             hayahora = state.hayahora,
-            urls = state.urls,
             vpnActive = state.vpnActive,
         )
 

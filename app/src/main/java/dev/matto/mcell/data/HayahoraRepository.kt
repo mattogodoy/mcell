@@ -22,7 +22,8 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Polls https://hayahora.futbol/estado/data.json and decides whether sport-streaming
- * blocks are *currently* active.
+ * blocks are *currently* active, mirroring the same rule the hayahora.futbol homepage
+ * applies to its hero banner.
  *
  * Observed schema (April 2026):
  * ```
@@ -44,13 +45,20 @@ import java.time.format.DateTimeFormatter
  * }
  * ```
  *
- * The dataset is a per-(ip, isp) history of blocking transitions. A block is currently
- * active for an entry when its most-recent `stateChanges` element has `state == true`.
- * The list-level status returned here is `Active` if **any** entry is currently active,
- * else `Inactive`. Schema surprises (missing `data`, no readable timestamps, etc.)
- * downgrade to `Unknown` rather than throw. If the top-level `lastUpdate` is older
- * than [maxStaleness] (or unparseable), we also return `Unknown` to avoid surfacing
- * data that may not reflect reality.
+ * Status rule (from the hayahora.futbol homepage script):
+ *  - For each entry whose `description == "Cloudflare"`, take the *last* element of its
+ *    `stateChanges` array (by array index — entries are stored chronologically). If
+ *    `state == true`, count this ISP toward the entry's IP, and remember the IP if it
+ *    is one of the two "key Cloudflare DNS-over-HTTPS" addresses (188.114.96.5 /
+ *    188.114.97.5).
+ *  - The dataset reports "blocked" if **either** more than ten distinct Cloudflare IPs
+ *    are currently blocked by more than two ISPs each, **or** both of the two key
+ *    Cloudflare IPs are blocked by any ISP.
+ *
+ * Schema surprises (missing `data`, no readable timestamps, etc.) downgrade to
+ * `Unknown` rather than throw. If the top-level `lastUpdate` is older than
+ * [maxStaleness] (or unparseable), we also return `Unknown` to avoid surfacing data
+ * that may not reflect reality.
  */
 interface HayahoraRepositoryLike {
     suspend fun fetchStatus(): BlockStatus
@@ -123,8 +131,7 @@ class HayahoraRepository(
             }
             val data = root["data"]?.jsonArray
                 ?: return BlockStatus.Unknown
-            val anyActive = data.any { entry -> entryIsCurrentlyActive(entry) }
-            if (anyActive) BlockStatus.Active else BlockStatus.Inactive
+            if (computeBlocked(data)) BlockStatus.Active else BlockStatus.Inactive
         } catch (ce: CancellationException) {
             throw ce
         } catch (e: Throwable) {
@@ -133,22 +140,29 @@ class HayahoraRepository(
         }
     }
 
-    /**
-     * An entry is currently active if its most recent `stateChanges` element has
-     * `state == true`. The latest element is selected by lexicographic timestamp
-     * compare — the observed format `YYYY-MM-DD HH:MM:SSZ` (and any ISO-like
-     * variant) sorts identically lexicographically and chronologically.
-     */
-    private fun entryIsCurrentlyActive(entry: JsonElement): Boolean = runCatching {
-        val obj = entry.jsonObject
-        val changes = obj["stateChanges"]?.jsonArray ?: return@runCatching false
-        if (changes.isEmpty()) return@runCatching false
-        val latest = changes.maxByOrNull { c ->
-            c.jsonObject["timestamp"]?.jsonPrimitive?.content ?: ""
-        }!!
-        latest.jsonObject["state"]?.jsonPrimitive?.booleanOrNull ?: false
-    }.getOrElse { e ->
-        Log.w("mcell.hayahora", "entry parse skipped: $e")
-        false
+    private fun computeBlocked(data: List<JsonElement>): Boolean {
+        val ispsByCloudflareIp = mutableMapOf<String, MutableSet<String>>()
+        val specificBlocked = mutableSetOf<String>()
+
+        for (entry in data) {
+            val obj = runCatching { entry.jsonObject }.getOrNull() ?: continue
+            if (obj["description"]?.jsonPrimitive?.content != "Cloudflare") continue
+            val changes = obj["stateChanges"]?.jsonArray ?: continue
+            if (changes.isEmpty()) continue
+            val last = runCatching { changes.last().jsonObject }.getOrNull() ?: continue
+            if (last["state"]?.jsonPrimitive?.booleanOrNull != true) continue
+            val ip = obj["ip"]?.jsonPrimitive?.content ?: continue
+            val isp = obj["isp"]?.jsonPrimitive?.content ?: continue
+            ispsByCloudflareIp.getOrPut(ip) { mutableSetOf() }.add(isp)
+            if (ip in SPECIFIC_CLOUDFLARE_IPS) specificBlocked += ip
+        }
+
+        val widelyBlockedCount = ispsByCloudflareIp.values.count { it.size > 2 }
+        val bothSpecificBlocked = specificBlocked.containsAll(SPECIFIC_CLOUDFLARE_IPS)
+        return widelyBlockedCount > 10 || bothSpecificBlocked
+    }
+
+    private companion object {
+        val SPECIFIC_CLOUDFLARE_IPS = setOf("188.114.96.5", "188.114.97.5")
     }
 }

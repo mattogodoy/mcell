@@ -2,26 +2,25 @@
   "lastUpdate": "2026-04-27 12:00:00",
   "data": [
     {
-      "ip": "104.16.93.114",
+      "ip": "188.114.96.5",
       "isp": "DIGI",
       "description": "Cloudflare",
       "stateChanges": [
-        {"timestamp": "2026-02-26 09:44:41Z", "state": false},
-        {"timestamp": "2026-02-28 16:34:43Z", "state": true},
-        {"timestamp": "2026-02-28 17:49:10Z", "state": false}
+        {"timestamp": "2026-04-25 10:00:00Z", "state": false},
+        {"timestamp": "2026-04-27 11:00:00Z", "state": true}
       ]
     },
     {
-      "ip": "151.101.1.140",
+      "ip": "188.114.97.5",
       "isp": "Movistar",
-      "description": "Fastly",
+      "description": "Cloudflare",
       "stateChanges": [
         {"timestamp": "2026-04-25 10:00:00Z", "state": false},
-        {"timestamp": "2026-04-26 11:00:00Z", "state": true}
+        {"timestamp": "2026-04-27 11:00:00Z", "state": true}
       ]
     },
     {
-      "ip": "172.67.1.1",
+      "ip": "104.16.0.1",
       "isp": "Vodafone",
       "description": "Cloudflare",
       "stateChanges": [

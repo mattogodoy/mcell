@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import dev.matto.mcell.R
 import dev.matto.mcell.domain.BannerColor
 import dev.matto.mcell.domain.BlockStatus
-import dev.matto.mcell.domain.UrlItem
 import dev.matto.mcell.ui.deriveBannerLabels
 import dev.matto.mcell.ui.theme.BannerGreenBg
 import dev.matto.mcell.ui.theme.BannerGreenBorder
@@ -37,11 +36,10 @@ import dev.matto.mcell.ui.theme.VpnPillText
 fun StatusBanner(
     deviceOffline: Boolean,
     hayahora: BlockStatus,
-    urls: List<UrlItem>,
     vpnActive: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val (color, labels) = deriveBannerLabels(deviceOffline, hayahora, urls)
+    val (color, labels) = deriveBannerLabels(deviceOffline, hayahora)
     val (bg, border, text) = when (color) {
         BannerColor.Red -> Triple(BannerRedBg, BannerRedBorder, BannerRedText)
         BannerColor.Yellow -> Triple(BannerYellowBg, BannerYellowBorder, BannerYellowText)
