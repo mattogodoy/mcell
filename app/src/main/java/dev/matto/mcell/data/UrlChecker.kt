@@ -2,6 +2,7 @@ package dev.matto.mcell.data
 
 import dev.matto.mcell.domain.CheckStatus
 import dev.matto.mcell.domain.NetworkErrorReason
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -32,6 +33,8 @@ class UrlChecker(private val client: OkHttpClient) {
                 }
                 mapCode(code)
             }
+        } catch (ce: CancellationException) {
+            throw ce
         } catch (e: Throwable) {
             CheckStatus.NetworkError(mapException(e))
         }

@@ -2,6 +2,7 @@ package dev.matto.mcell.data
 
 import android.util.Log
 import dev.matto.mcell.domain.BlockStatus
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -63,7 +64,7 @@ class HayahoraRepository(
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC)
 
     suspend fun fetchStatus(): BlockStatus = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val req = Request.Builder()
                 .url(url)
                 .header("Cache-Control", "no-cache, no-store")
@@ -81,27 +82,34 @@ class HayahoraRepository(
                 }
                 parseStatus(body)
             }
-        }.getOrElse { e ->
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (e: Throwable) {
             Log.w("mcell.hayahora", "fetchStatus failed", e)
             BlockStatus.Unknown
         }
     }
 
     private fun parseStatus(body: String): BlockStatus {
-        val element: JsonElement = runCatching { json.parseToJsonElement(body) }
-            .getOrElse {
-                Log.w("mcell.hayahora", "parse failed: $it")
-                return BlockStatus.Unknown
-            }
-        return runCatching {
+        val element: JsonElement = try {
+            json.parseToJsonElement(body)
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (e: Throwable) {
+            Log.w("mcell.hayahora", "parse failed: $e")
+            return BlockStatus.Unknown
+        }
+        return try {
             val root = element.jsonObject
             val lastUpdate = root["lastUpdate"]?.jsonPrimitive?.content
                 ?: return BlockStatus.Unknown
-            val lastUpdateInstant = runCatching {
+            val lastUpdateInstant = try {
                 LocalDateTime.parse(lastUpdate, lastUpdateFormatter)
                     .toInstant(ZoneOffset.UTC)
-            }.getOrElse {
-                Log.w("mcell.hayahora", "lastUpdate parse failed: $it")
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (e: Throwable) {
+                Log.w("mcell.hayahora", "lastUpdate parse failed: $e")
                 return BlockStatus.Unknown
             }
             val age = Duration.between(lastUpdateInstant, clock.instant())
@@ -113,8 +121,10 @@ class HayahoraRepository(
                 ?: return BlockStatus.Unknown
             val anyActive = data.any { entry -> entryIsCurrentlyActive(entry) }
             if (anyActive) BlockStatus.Active else BlockStatus.Inactive
-        }.getOrElse {
-            Log.w("mcell.hayahora", "schema mismatch: $it")
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (e: Throwable) {
+            Log.w("mcell.hayahora", "schema mismatch: $e")
             BlockStatus.Unknown
         }
     }
