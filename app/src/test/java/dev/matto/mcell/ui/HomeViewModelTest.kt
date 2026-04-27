@@ -95,8 +95,8 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `addUrl rejects when at five urls`() = runTest(dispatcher) {
-        val list = fakeListRepo((1..5).map { "https://h$it.example" })
+    fun `addUrl rejects when at MAX_URLS`() = runTest(dispatcher) {
+        val list = fakeListRepo((1..HomeViewModel.MAX_URLS).map { "https://h$it.example" })
         val vm = HomeViewModel(list, fakeChecker(), fakeHayahora(), MutableStateFlow(true), MutableStateFlow(false))
         advanceUntilIdle()
 

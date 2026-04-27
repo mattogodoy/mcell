@@ -19,7 +19,6 @@
     <!-- Buttons -->
     <string name="recheck_all">Recomprobar todo</string>
     <string name="manage_urls">Gestionar URLs</string>
-    <string name="cancel">Cancelar</string>
     <string name="confirm_add">Añadir</string>
     <string name="close">Cerrar</string>
     <string name="delete">Eliminar</string>
@@ -39,7 +38,7 @@
     <!-- Manage URLs dialog -->
     <string name="manage_title">Gestionar URLs</string>
     <string name="manage_hint">https://ejemplo.com</string>
-    <string name="manage_full">Has alcanzado el máximo de 5 URLs</string>
+    <string name="manage_full">Has alcanzado el máximo de 6 URLs</string>
     <string name="manage_duplicate">Ya añadida</string>
     <string name="manage_invalid">URL inválida</string>
 

@@ -158,5 +158,5 @@ class HomeViewModel(
         }.getOrNull()
     }
 
-    companion object { const val MAX_URLS = 5 }
+    companion object { const val MAX_URLS = 6 }
 }

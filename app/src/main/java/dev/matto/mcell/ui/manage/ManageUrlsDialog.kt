@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import dev.matto.mcell.R
 import dev.matto.mcell.ui.AddUrlResult
+import dev.matto.mcell.ui.HomeViewModel
 import dev.matto.mcell.ui.theme.Bg
 import dev.matto.mcell.ui.theme.BgElevated
 import dev.matto.mcell.ui.theme.TextMuted
@@ -58,6 +57,7 @@ fun ManageUrlsDialog(
     val errorDuplicate = stringResource(R.string.manage_duplicate)
     val errorFull = stringResource(R.string.manage_full)
     val errorInvalid = stringResource(R.string.manage_invalid)
+    val isFull = urls.size >= HomeViewModel.MAX_URLS
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -73,7 +73,7 @@ fun ManageUrlsDialog(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.manage_title), color = TextMuted, modifier = Modifier.weight(1f))
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close), tint = TextMuted)
                     }
                 }
                 Spacer(Modifier.height(16.dp))
@@ -90,7 +90,11 @@ fun ManageUrlsDialog(
                         ) {
                             Text(url, color = TextMuted, modifier = Modifier.weight(1f))
                             IconButton(onClick = { scope.launch { onRemove(url) } }) {
-                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete),
+                                    tint = TextSecondary,
+                                )
                             }
                         }
                         Spacer(Modifier.height(6.dp))
@@ -101,7 +105,10 @@ fun ManageUrlsDialog(
                 OutlinedTextField(
                     value = input,
                     onValueChange = { input = it; error = null },
-                    placeholder = { Text(stringResource(R.string.manage_hint)) },
+                    placeholder = {
+                        Text(stringResource(if (isFull) R.string.manage_full else R.string.manage_hint))
+                    },
+                    enabled = !isFull,
                     isError = error != null,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -110,10 +117,8 @@ fun ManageUrlsDialog(
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-                    Spacer(Modifier.width(8.dp))
                     Button(
-                        enabled = urls.size < 5,
+                        enabled = !isFull && input.isNotBlank(),
                         onClick = {
                             scope.launch {
                                 when (onAdd(input)) {
