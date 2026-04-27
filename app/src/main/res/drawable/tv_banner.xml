@@ -1,15 +1,13 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="320dp"
-    android:height="180dp"
-    android:viewportWidth="320"
-    android:viewportHeight="180">
-    <path
-        android:fillColor="#0E1116"
-        android:pathData="M0,0 H320 V180 H0 Z" />
-    <path
-        android:fillColor="#EF4444"
-        android:pathData="M40,90 L80,140 L0,140 Z" />
-    <path
-        android:fillColor="#E6E6E6"
-        android:pathData="M120,70 H280 V90 H120 Z M120,100 H260 V120 H120 Z" />
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E4E3E3" />
+        </shape>
+    </item>
+    <item android:gravity="center">
+        <bitmap
+            android:src="@drawable/ic_launcher_photo"
+            android:gravity="center" />
+    </item>
+</layer-list>
